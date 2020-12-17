@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { withRouter } from "react-router-dom"
 import { connect } from "react-redux";
-import { setSelectedUser } from "../redux/actions"
+import { setSelectedUser, setMenuShow } from "../redux/actions"
 import config from "../config"
 import moment from "moment"
  
@@ -15,6 +15,7 @@ class SideBar extends Component {
 	}
 
 	navigateToMessage = (user) => {
+		this.props.setMenuShow(true)
 		this.props.setSelectedUser(user)
 		this.props.history.replace({ pathname: "/"+user.socketId,  })
 	}
@@ -83,5 +84,5 @@ export default withRouter(connect(
 		myInfo: state.userReducer.myInfo,
 		messages: state.userReducer.messages
 	}), 
-	{ setSelectedUser }
+	{ setSelectedUser, setMenuShow }
 )(SideBar))

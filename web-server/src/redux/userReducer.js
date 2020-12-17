@@ -1,4 +1,4 @@
-import { SET_ACTIVE_USERS, SET_MESSAGES, SET_MY_INFO, SET_SELECTED_USER } from "./actionTypes";
+import { SET_ACTIVE_USERS, SET_MENU_SHOW, SET_MESSAGES, SET_MY_INFO, SET_SELECTED_USER } from "./actionTypes";
 
 const initialState = {
     myInfo: null,
@@ -6,7 +6,8 @@ const initialState = {
         
     ],
     selectedUser: null,
-    messages: []
+    messages: [],
+    menuShow: false
 }
 
 const readWriteActiveUsers = (state = initialState, action) => {
@@ -22,6 +23,9 @@ const readWriteActiveUsers = (state = initialState, action) => {
         }
         case SET_MESSAGES: {
             return ({ ...state, messages: action.payload.messages })
+        }
+        case SET_MENU_SHOW: {
+            return ({ ...state, menuShow: action.payload.show })
         }
         default: {
             return state;

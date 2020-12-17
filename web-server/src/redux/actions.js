@@ -1,4 +1,4 @@
-import { SET_ACTIVE_USERS, SET_SELECTED_USER, SET_MY_INFO, SET_MESSAGES } from "./actionTypes";
+import { SET_ACTIVE_USERS, SET_SELECTED_USER, SET_MY_INFO, SET_MESSAGES, SET_MENU_SHOW } from "./actionTypes";
 
 export const setActiveUsers = users => {
     return ({ 
@@ -25,5 +25,12 @@ export const setMessages = messages => {
     return ({ 
         type: SET_MESSAGES, 
         payload: { messages } 
+    });
+}
+
+export const setMenuShow = show => {
+    return ({ 
+        type: SET_MENU_SHOW, 
+        payload: { show } 
     });
 }

@@ -2,7 +2,7 @@ import React, { Component, useState } from "react"
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { withRouter } from "react-router-dom"
 import { connect } from "react-redux";
-import { setSelectedUser, setMessages } from "../redux/actions"
+import { setSelectedUser, setMessages, setMenuShow } from "../redux/actions"
 import config from "../config"
 import socket from "../socketClient"
 import moment from 'moment';
@@ -66,7 +66,7 @@ class MainMessageArea extends Component {
 		return (
 			<div className={"" + this.props.className} style={{ ...this.props.style}}>
 				<div className="d-flex align-items-center" style={{ backgroundColor: "#c5dec5", height: 60, boxShadow: "0rem 0.065rem 0.12rem lightgray", marginBottom: 1 }}>
-					{ this.props.selectedUser && <Header selectedUser={this.props.selectedUser} /> }
+					{ this.props.selectedUser && <Header setMenuShow={this.props.setMenuShow} menuShow={this.props.menuShow} width={this.props.page.width} selectedUser={this.props.selectedUser} /> }
 				</div>
 				<div className="" style={{ height: this.props.page.height-127 }}>
 					<PerfectScrollbar containerRef = {(ref) => { this.scrollRef = ref; }} >
@@ -83,10 +83,15 @@ class MainMessageArea extends Component {
 	}
 }
 
-const Header = ({ selectedUser }) => {
+const Header = ({ selectedUser, setMenuShow, menuShow, width }) => {
 	if(!selectedUser) return null
 	return (
 		<div className="d-flex" style={{ height: 58, cursor: "default" }}>
+			{width<=1000 && <div className="d-flex align-items-center ps-2">
+				<div className="btn btn-sm shadow-sm px-2" onClick={e => setMenuShow(!menuShow)}>
+					<i className="fas fa-bars fa-2x text-secondary text-success"></i>
+				</div>
+			</div>}
 			<div className="d-flex align-items-center justify-content-center ps-3">
 				<img src={config.api.API+selectedUser.avatarUrl} className="img-thumbnail rounded-circle p-0 avatar-img-1" alt={"user-avatar"} />
 			</div>
@@ -181,7 +186,8 @@ export default withRouter(connect(
 		selectedUser: state.userReducer.selectedUser,
 		activeUsers: state.userReducer.activeUsers,
 		myInfo: state.userReducer.myInfo,
-		messages: state.userReducer.messages
+		messages: state.userReducer.messages,
+		menuShow: state.userReducer.menuShow
 	}), 
-	{ setSelectedUser, setMessages }
+	{ setSelectedUser, setMessages, setMenuShow }
 )(MainMessageArea))

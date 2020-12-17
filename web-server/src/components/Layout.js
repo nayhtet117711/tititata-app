@@ -84,14 +84,14 @@ class Layout extends Component {
 					<Switch>
 						<Route path={`/:userId`}>
 							<>
-								<SideBar className="bg-light" style={{ minWidth: 280, borderRight: '1px solid lightgray' }} page={this.state.page} />
-								<MainMessageArea className="bg-white flex-fill" page={this.state.page} />
+								<SideBar className="bg-light" style={{ width: this.state.page.width>=1000 ? 280 : !this.props.menuShow ? this.state.page.width-60 : 0, borderRight: '1px solid lightgray' }} page={this.state.page} />
+								<MainMessageArea className="bg-white flex-fill" page={this.state.page} style={{ width: this.state.page.width>=1000 ? undefined: 60 }} />
 							</>
 						</Route>
 						<Route path={`/`}>
 							<>
-								<SideBar className="bg-light" style={{ minWidth: 320, borderRight: '1px solid lightgray' }} page={this.state.page} />
-								<EmptyUserArea />
+								<SideBar className="bg-light" style={{ width: this.state.page.width>=1000 ? 320 : "100%", borderRight: '1px solid lightgray' }} page={this.state.page} />
+								{this.state.page.width>=1000 && <EmptyUserArea />}
 							</>							
 						</Route>
 						<Redirect to="/" />
@@ -118,7 +118,9 @@ export default withRouter(connect(
 		state => ({ 
 			activeUsers: state.userReducer.activeUsers,
 			myInfo: state.userReducer.myInfo,
-			messages: state.userReducer.messages
+			messages: state.userReducer.messages,
+			menuShow: state.userReducer.menuShow,
+			selectedUser: state.userReducer.selectedUser
 		}), 
 		{ setMyInfo, setActiveUsers, setMessages }
 	)
