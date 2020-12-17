@@ -1,6 +1,7 @@
 import {io} from "socket.io-client"
+import config from "./config"
 
-const SOCKET_SERVER = "http://192.168.100.59:10101/"
+// const SOCKET_SERVER = "http://192.168.100.59:10101/"
 
 class SocketClient {
     constructor() {
@@ -9,9 +10,9 @@ class SocketClient {
     }
 
     doConnect = (displayName) => {
-        this.socketIoClient = io(SOCKET_SERVER, {
+        this.socketIoClient = io(config.api.BASE_URL, {
             transports: ['websocket'],
-            withCredentials: false,
+            withCredentials: true,
             reconnectionDelayMax: 1800,
             query: {
                 displayName: displayName
@@ -41,7 +42,7 @@ class SocketClient {
     }
 
     onReady(callback) {
-        
+
     }
 
     on(event, callback) {
