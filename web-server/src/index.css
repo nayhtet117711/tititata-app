@@ -13,7 +13,7 @@ code {
     monospace;
 }
 .user-item-selected {
-  background-color: #185C2730 !important;
+  background-color: #aaaaaa21 !important;
 }
 .user-item {
   transition: 50ms;
@@ -46,4 +46,9 @@ code {
 .avatar-img-1 {
   width: 40px !important;
   height: 40px !important;
+}
+
+.avatar-img-2 {
+  width: 50px !important;
+  height: 50px !important;
 }

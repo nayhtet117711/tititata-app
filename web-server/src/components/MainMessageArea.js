@@ -2,17 +2,15 @@ import React, { Component, useState } from "react"
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { withRouter } from "react-router-dom"
 import { connect } from "react-redux";
-import { setSelectedUser } from "../redux/actions"
+import { setSelectedUser, setMessages } from "../redux/actions"
 import config from "../config"
 import socket from "../socketClient"
+import moment from 'moment';
 
 class MainMessageArea extends Component {
 	constructor(props) {
 		super(props)
 		this.scrollRef = React.createRef(null)
-		this.state = {
-			messages: []
-		}
 	}
 
 	componentDidMount() {	
@@ -25,25 +23,27 @@ class MainMessageArea extends Component {
 				this.props.setSelectedUser(this.props.activeUsers.find(u => u.socketId===this.props.match.params.userId))
 			}
 		} 
-		setTimeout(this.listening, 10)
+		// setTimeout(this.listening, 10)
 	}
 
-	listening = () => {
-		socket.on("priv-msg", data => {
-			// console.log("priv-msg: ", data)
-			if(data.from===this.props.myInfo.socketId) {
-				this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "sent"}] }))
-				// const audio = new window.Audio("https://proxy.notificationsounds.com/notification-sounds/clearly-602/download/file-sounds-1143-clearly.mp3");
-				// audio.volume = 0.1;
-				// audio.play();
-			} else if(data.to===this.props.myInfo.socketId) {
-				this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "received"}] }))
-				const audio = new window.Audio("https://proxy.notificationsounds.com/message-tones/pristine-609/download/file-sounds-1150-pristine.mp3");
-				audio.volume = 0.5;
-				audio.play();
-			}
-		})
-	}
+	// listening = () => {
+	// 	socket.on("priv-msg", data => {
+	// 		// console.log("priv-msg: ", data)
+	// 		if(data.from===this.props.myInfo.socketId) {
+	// 			this.props.setMessages([...this.props.messages, {...data, type: "sent"}])
+	// 			// this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "sent"}] }))
+	// 			// const audio = new window.Audio("https://proxy.notificationsounds.com/notification-sounds/clearly-602/download/file-sounds-1143-clearly.mp3");
+	// 			// audio.volume = 0.1;
+	// 			// audio.play();
+	// 		} else if(data.to===this.props.myInfo.socketId) {
+	// 			this.props.setMessages([...this.props.messages, {...data, type: "received"}])
+	// 			// this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "received"}] }))
+	// 			const audio = new window.Audio("https://proxy.notificationsounds.com/message-tones/pristine-609/download/file-sounds-1150-pristine.mp3");
+	// 			audio.volume = 0.5;
+	// 			audio.play();
+	// 		}
+	// 	})
+	// }
 
 	componentDidUpdate(prevProps) {
 		if(prevProps.match.params.userId !== this.props.match.params.userId) {
@@ -60,12 +60,12 @@ class MainMessageArea extends Component {
 
 	render() {
 
-		const MessageListView = this.state.messages
+		const MessageListView = this.props.messages
 			.filter(v => v.from===this.props.selectedUser.socketId || v.to===this.props.selectedUser.socketId)
 			.map((v, i) => v.type==="sent" ? <MessageSentBox key={i} data={v} /> : <MessageReceivedBox key={i} data={v} /> )
 		return (
 			<div className={"" + this.props.className} style={{ ...this.props.style}}>
-				<div className="d-flex align-items-center bg-light" style={{ height: 60, boxShadow: "0rem 0.065rem 0.12rem lightgray", marginBottom: 1 }}>
+				<div className="d-flex align-items-center" style={{ backgroundColor: "#c5dec5", height: 60, boxShadow: "0rem 0.065rem 0.12rem lightgray", marginBottom: 1 }}>
 					{ this.props.selectedUser && <Header selectedUser={this.props.selectedUser} /> }
 				</div>
 				<div className="" style={{ height: this.props.page.height-127 }}>
@@ -146,23 +146,31 @@ const InputFooter = (props) => {
 }
 
 const MessageReceivedBox = ({ data }) => {
+	const [show, setShow] = useState(false)
 	return (
-		<div className="py-2 px-4 d-flex justify-content-start">
-			<div className="px-2 py-1 shadow-sm rounded-3" style={{ minWidth: 220, backgroundColor: "#d5e5d5",   borderWidth: 1, borderStyle: "outset" }}>
-				<div className="text-dark">{data.text}</div>
-				<div className="text-end text-secondary"><small>{new Date(data.ts).toISOString()}</small></div>
+		<div className="py-2 ">
+			<div className="px-4 d-flex justify-content-start">
+				<div onClick={e => setShow(!show)} className="px-2 py-1 shadow-sm rounded-3" style={{ minWidth: 220, backgroundColor: "#d5e5d5",   borderWidth: 1, borderStyle: "outset" }}>
+					<div className="text-dark">{data.text}</div>
+					<div className="text-end text-secondary" style={{ fontSize: "0.8em"}}>{moment(data.ts).format("LT")}</div>
+				</div>
 			</div>
+			{show && <div className="px-4 pt-1" style={{ fontSize: "0.7em" }}>&nbsp;{moment(data.ts).format("llll")}</div> }
 		</div>
 	)
 }
 
 const MessageSentBox = ({ data }) => {
+	const [show, setShow] = useState(false)
 	return (
-		<div className="py-2 pe-4  d-flex justify-content-end" style={{ paddingLeft: 80 }}>
-			<div className="px-2 py-1 shadow-sm rounded-3" style={{ minWidth: 220, backgroundColor: "#f0f0f0",   borderWidth: 1, borderStyle: "outset" }}>
-				<div className="text-dark">{data.text}</div>
-				<div className="text-end text-secondary"><small>{new Date(data.ts).toISOString()}</small></div>
+		<div className="py-2 ">
+			<div className="pe-4  d-flex justify-content-end" style={{ paddingLeft: 80 }}>
+				<div onClick={e => setShow(!show)} className="px-2 py-1 shadow-sm rounded-3" style={{ minWidth: 220, backgroundColor: "#f0f0f0",   borderWidth: 1, borderStyle: "outset" }}>
+					<div className="text-dark">{data.text}</div>
+					<div className="text-end text-secondary" style={{ fontSize: "0.8em"}}>{moment(data.ts).format("LT")}</div>
+				</div>
 			</div>
+			{show && <div className="px-4 pt-1" style={{ fontSize: "0.7em" }}>&nbsp;{moment(data.ts).format("llll")}</div> }
 		</div>
 	)
 }
@@ -172,7 +180,8 @@ export default withRouter(connect(
 	state => ({
 		selectedUser: state.userReducer.selectedUser,
 		activeUsers: state.userReducer.activeUsers,
-		myInfo: state.userReducer.myInfo
+		myInfo: state.userReducer.myInfo,
+		messages: state.userReducer.messages
 	}), 
-	{ setSelectedUser }
+	{ setSelectedUser, setMessages }
 )(MainMessageArea))

@@ -3,7 +3,7 @@ import SideBar from "./SideBar"
 import MainMessageArea from "./MainMessageArea"
 import { withRouter, Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux"
-import { setMyInfo, setActiveUsers } from "../redux/actions"
+import { setMyInfo, setActiveUsers, setMessages } from "../redux/actions"
 import socket from "../socketClient"
 
 class Layout extends Component {
@@ -23,6 +23,27 @@ class Layout extends Component {
 		this.responsiveHandler(window)
 
 		this.handleSocketClient()
+
+		setTimeout(this.listeningMessages, 10)
+	}
+
+	listeningMessages = () => {
+		socket.on("priv-msg", data => {
+			if(data.from===this.props.myInfo.socketId) {
+				this.props.setMessages([...this.props.messages, {...data, type: "sent"}])
+				// this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "sent"}] }))
+				// const audio = new window.Audio("https://proxy.notificationsounds.com/notification-sounds/clearly-602/download/file-sounds-1143-clearly.mp3");
+				// audio.volume = 0.1;
+				// audio.play();
+			} else if(data.to===this.props.myInfo.socketId) {
+				console.log("message: ", [...this.props.messages, {...data, type: "received"}])
+				this.props.setMessages([...this.props.messages, {...data, type: "received"}])
+				// this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "received"}] }))
+				const audio = new window.Audio("https://proxy.notificationsounds.com/message-tones/pristine-609/download/file-sounds-1150-pristine.mp3");
+				audio.volume = 0.5;
+				audio.play();
+			}
+		})
 	}
 
 	componentWillUnmount() {
@@ -96,8 +117,9 @@ const EmptyUserArea = () => {
 export default withRouter(connect( 
 		state => ({ 
 			activeUsers: state.userReducer.activeUsers,
-			myInfo: state.userReducer.myInfo
+			myInfo: state.userReducer.myInfo,
+			messages: state.userReducer.messages
 		}), 
-		{ setMyInfo, setActiveUsers }
+		{ setMyInfo, setActiveUsers, setMessages }
 	)
 	(Layout));
