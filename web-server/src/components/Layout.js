@@ -5,6 +5,7 @@ import { withRouter, Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux"
 import { setMyInfo, setActiveUsers, setMessages } from "../redux/actions"
 import socket from "../socketClient"
+import VideoCall from "./testVideoCall"
 
 class Layout extends Component {
 	constructor(props) {
@@ -12,10 +13,14 @@ class Layout extends Component {
 		this.state = {
 			page: { width: 800, height: 800 }
 		}
+		
 	}
 
 	componentDidMount() {
+		
 		socket.doConnect(this.props.displayName)
+
+		// this.testVideoCall()	
 
 		window.onresize = (e) => {
             this.responsiveHandler(e.target)
@@ -25,6 +30,23 @@ class Layout extends Component {
 		this.handleSocketClient()
 
 		setTimeout(this.listeningMessages, 10)
+
+		this.videoCall = new VideoCall(socket)
+		this.videoCall.listen()
+			
+	}
+
+	testVideoCall = async (socketId) => {
+		console.log("testVideoCall: ", socketId)
+		try {
+			
+			await this.videoCall.makeCall(socketId)
+		} catch(error) {
+			console.error(error)
+		}
+
+		// console.log(this.videoCall)
+
 	}
 
 	listeningMessages = () => {
@@ -36,9 +58,7 @@ class Layout extends Component {
 				// audio.volume = 0.1;
 				// audio.play();
 			} else if(data.to===this.props.myInfo.socketId) {
-				console.log("message: ", [...this.props.messages, {...data, type: "received"}])
 				this.props.setMessages([...this.props.messages, {...data, type: "received"}])
-				// this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "received"}] }))
 				const audio = new window.Audio("https://proxy.notificationsounds.com/message-tones/pristine-609/download/file-sounds-1150-pristine.mp3");
 				audio.volume = 0.5;
 				audio.play();
@@ -77,6 +97,7 @@ class Layout extends Component {
 			: "100%"
 
 		if(!socket) return "Connecting.."
+		
 		return (
 			<div className="bg-secondary d-flex justify-content-center" style={{ height: "100vh", padding: 0 }}>
 				<div className="d-flex border shadow" style={{ height: "100%", width: widthPercent, }}>
@@ -84,13 +105,21 @@ class Layout extends Component {
 					<Switch>
 						<Route path={`/:userId`}>
 							<>
-								<SideBar className="bg-light" style={{ width: this.state.page.width>=1000 ? 280 : !this.props.menuShow ? this.state.page.width-60 : 0, borderRight: '1px solid lightgray' }} page={this.state.page} />
+								<SideBar 
+									onCall={this.testVideoCall} 
+									className="bg-light" 
+									style={{ width: this.state.page.width>=1000 ? 280 : !this.props.menuShow ? this.state.page.width-60 : 0, borderRight: '1px solid lightgray' }} 
+									page={this.state.page} />
 								<MainMessageArea className="bg-white flex-fill" page={this.state.page} style={{ width: this.state.page.width>=1000 ? undefined: 60 }} />
 							</>
 						</Route>
 						<Route path={`/`}>
 							<>
-								<SideBar className="bg-light" style={{ width: this.state.page.width>=1000 ? 320 : "100%", borderRight: '1px solid lightgray' }} page={this.state.page} />
+								<SideBar 
+									onCall={this.testVideoCall}  
+									className="bg-light" 
+									style={{ width: this.state.page.width>=1000 ? 320 : "100%", borderRight: '1px solid lightgray' }} 
+									page={this.state.page} />
 								{this.state.page.width>=1000 && <EmptyUserArea />}
 							</>							
 						</Route>

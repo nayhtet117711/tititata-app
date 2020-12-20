@@ -53,6 +53,18 @@ module.exports = class SocketServer {
 
     handleUserEvent = socket => {
         socket.on(this.events.privateMessage, data => this.socketController.handlePrivateMessage(socket, data))
+
+        // video test
+        socket.on("req-call", data => {
+            socket.to(data.socketId).emit("req-call", { socketId: socket.id })
+        })
+        socket.on("accept-call", data => {
+            socket.to(data.socketId).emit("accept-call", { socketId: socket.id, answer: data.answer })
+        })
+        socket.on("offer", data => {
+            socket.to(data.socketId).emit("offer", { socketId: socket.id, offer: data.offer })
+        })
+
     }
 
 }

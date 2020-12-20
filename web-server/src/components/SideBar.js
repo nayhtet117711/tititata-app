@@ -23,6 +23,7 @@ class SideBar extends Component {
 	render() {
 		const userListView = this.props.activeUsers.map(v => (
 			<UserItem 
+				onCall={this.props.onCall}
 				match = {this.props.match}
 				key={v.socketId} 
 				user={v} 
@@ -61,7 +62,7 @@ const Header = ({ myInfo }) => {
 	)
 }
 
-const UserItem = ({ user, latestMessage, onClick=()=>null, match }) => {
+const UserItem = ({ user, latestMessage, onClick=()=>null, match, onCall }) => {
 	return (
 		<div className={"d-flex bg-white user-item "+(match.params.userId===user.socketId ? "user-item-selected" : "")} title={latestMessage} style={{ height: 70, cursor: "pointer" }} onClick={onClick}>
 			<div className="d-flex align-items-center justify-content-center ps-3">
@@ -73,6 +74,15 @@ const UserItem = ({ user, latestMessage, onClick=()=>null, match }) => {
 					{ latestMessage.ts>0 && <div className="text-end text-secondary px-1" style={{ fontSize: "0.8em"}}>{moment(latestMessage.ts).format("LT")}</div> }
 				</div>
 				<div className="text-secondary ellipsis" style={{ fontSize: "0.9em" }}>{latestMessage.text}</div>
+			</div>
+			<div className="d-flex align-items-center justify-content-center px-2">
+				<button className="btn btn-sm btn-primary" 
+				onClick={e => {
+					e.preventDefault(true)
+					e.stopPropagation()
+					onCall(user.socketId)
+				} }
+				>CALL</button>
 			</div>
 		</div>
 	)
