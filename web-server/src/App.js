@@ -10,7 +10,7 @@ class App extends Component {
 	constructor() {
 		super()
 		this.state = {
-			modalVisible: false,
+			modalVisible: true,
 			enteranceName: null//"User "+Math.round(Math.random() * 100)
 		}
 	}
