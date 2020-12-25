@@ -11,7 +11,7 @@ class App extends Component {
 		super()
 		this.state = {
 			modalVisible: false,
-			enteranceName: "User "+Math.round(Math.random() * 100)
+			enteranceName: null//"User "+Math.round(Math.random() * 100)
 		}
 	}
 	onEnter = enteranceName => {
