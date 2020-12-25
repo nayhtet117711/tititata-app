@@ -20,6 +20,7 @@ class SocketClient {
         })
         this.socketIoClient.on("connect", () => {
             console.log("Connected ", this.socketIoClient.id)
+            this.socketId = this.socketIoClient.id
         })
         this.socketIoClient.on("connect_error", error => {
             console.log("Connect-ERROR .....", error)

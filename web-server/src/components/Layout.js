@@ -5,7 +5,7 @@ import { withRouter, Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux"
 import { setMyInfo, setActiveUsers, setMessages } from "../redux/actions"
 import socket from "../socketClient"
-import VideoCall from "./testVideoCall"
+import VideoCall from "./testVideoCall2"
 
 class Layout extends Component {
 	constructor(props) {
@@ -19,7 +19,6 @@ class Layout extends Component {
 	componentDidMount() {
 		
 		socket.doConnect(this.props.displayName)
-
 		// this.testVideoCall()	
 
 		window.onresize = (e) => {
@@ -31,9 +30,15 @@ class Layout extends Component {
 
 		setTimeout(this.listeningMessages, 10)
 
-		this.videoCall = new VideoCall(socket)
-		this.videoCall.listen()
+		socket.onConnect(() => {
+			this.videoCall = new VideoCall(socket)
+			this.videoCall.listen()
+		})
 			
+	}
+
+	handleVideoCallHangout = () => {
+		this.videoCall.hangout()
 	}
 
 	testVideoCall = async (socketId) => {
@@ -99,34 +104,45 @@ class Layout extends Component {
 		if(!socket) return "Connecting.."
 		
 		return (
-			<div className="bg-secondary d-flex justify-content-center" style={{ height: "100vh", padding: 0 }}>
-				<div className="d-flex border shadow" style={{ height: "100%", width: widthPercent, }}>
-					{/* <SideBar className="bg-light" style={{ minWidth: 320, borderRight: '1px solid lightgray' }} page={this.state.page} /> */}
-					<Switch>
-						<Route path={`/:userId`}>
-							<>
-								<SideBar 
-									onCall={this.testVideoCall} 
-									className="bg-light" 
-									style={{ width: this.state.page.width>=1000 ? 280 : !this.props.menuShow ? this.state.page.width-60 : 0, borderRight: '1px solid lightgray' }} 
-									page={this.state.page} />
-								<MainMessageArea className="bg-white flex-fill" page={this.state.page} style={{ width: this.state.page.width>=1000 ? undefined: 60 }} />
-							</>
-						</Route>
-						<Route path={`/`}>
-							<>
-								<SideBar 
-									onCall={this.testVideoCall}  
-									className="bg-light" 
-									style={{ width: this.state.page.width>=1000 ? 320 : "100%", borderRight: '1px solid lightgray' }} 
-									page={this.state.page} />
-								{this.state.page.width>=1000 && <EmptyUserArea />}
-							</>							
-						</Route>
-						<Redirect to="/" />
-					</Switch>
+			<>
+				<div className="video-container" id="video-container">
+					<video autoPlay className="remote-video shadow" id="remote-video"  ></video>
+					<video autoPlay className="local-video shadow border" muted id="local-video" ></video>
+					<div className="hangout-button-container p-2" align="center">
+						<button className="btn btn-sm btn-danger rounded-pill" onClick={this.handleVideoCallHangout}>Hangout</button>
+					</div>
 				</div>
-			</div>
+				<div className="bg-secondary d-flex justify-content-center" style={{ height: "100vh", padding: 0 }}>
+					<div className="d-flex border shadow" style={{ height: "100%", width: widthPercent, }}>
+						{/* <SideBar className="bg-light" style={{ minWidth: 320, borderRight: '1px solid lightgray' }} page={this.state.page} /> */}
+						<Switch>
+							<Route path={`/:userId`}>
+								<>
+									<SideBar 
+										onCall={this.testVideoCall} 
+										className="bg-light" 
+										style={{ width: this.state.page.width>=1000 ? 280 : !this.props.menuShow ? this.state.page.width-60 : 0, borderRight: '1px solid lightgray' }} 
+										page={this.state.page} />
+									<MainMessageArea className="bg-white flex-fill" page={this.state.page} style={{ width: this.state.page.width>=1000 ? undefined: 60 }} />
+								</>
+							</Route>
+							<Route path={`/`}>
+								<>
+									<SideBar 
+										onCall={this.testVideoCall}  
+										className="bg-light" 
+										style={{ width: this.state.page.width>=1000 ? 320 : "100%", borderRight: '1px solid lightgray' }} 
+										page={this.state.page} />
+									{this.state.page.width>=1000 && <EmptyUserArea />}
+								</>							
+							</Route>
+							<Redirect to="/" />
+						</Switch>
+						
+					</div>
+				</div>
+				
+			</>
 		);
 	}
 

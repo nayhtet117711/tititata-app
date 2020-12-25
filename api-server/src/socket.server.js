@@ -54,6 +54,7 @@ module.exports = class SocketServer {
     handleUserEvent = socket => {
         socket.on(this.events.privateMessage, data => this.socketController.handlePrivateMessage(socket, data))
 
+        /*
         // video test
         socket.on("req-call", data => {
             socket.to(data.socketId).emit("req-call", { socketId: socket.id })
@@ -63,6 +64,32 @@ module.exports = class SocketServer {
         })
         socket.on("offer", data => {
             socket.to(data.socketId).emit("offer", { socketId: socket.id, offer: data.offer })
+        })
+        */
+
+        socket.on("make-call", data => {
+            console.log("ON make-call ", data)
+            for(let s of data.toSocketIds) {
+                console.log("Emit make-call ", s)
+                socket.to(s).emit("make-call", data)
+            }
+        })
+
+        socket.on("webrtc_offer", data => {
+            console.log("ON webrtc_offer ", data)
+            socket.to(data.roomId).emit("webrtc_offer", data)
+        })
+
+        socket.on("webrtc_answer", data => {
+            console.log("ON webrtc_answer ", data)
+            for(let s of data.toSocketIds) {
+                socket.to(s).emit("webrtc_answer", data)
+            }
+        })
+
+        socket.on("webrtc_ice_candidate", data => {
+            console.log("ON webrtc_ice_candidate ", data)
+            socket.to(data.roomId).emit("webrtc_ice_candidate", data)
         })
 
     }

@@ -10,8 +10,8 @@ class App extends Component {
 	constructor() {
 		super()
 		this.state = {
-			modalVisible: true,
-			enteranceName: ""
+			modalVisible: false,
+			enteranceName: "User "+Math.round(Math.random() * 100)
 		}
 	}
 	onEnter = enteranceName => {
@@ -25,6 +25,7 @@ class App extends Component {
 						? <EntranceModal visible={this.state.modalVisible} onEnter={this.onEnter} />
 					 	: <Layout displayName={this.state.enteranceName}/> 
 					}
+					
 				</BrowserRouter>
 			</Provider>
 		);
