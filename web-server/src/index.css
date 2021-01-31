@@ -52,3 +52,19 @@ code {
   width: 50px !important;
   height: 50px !important;
 }
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #c5dec5 !important;
+  opacity: 1; /* Firefox */
+}
+
+.form-control:focus {
+  border-color: inherit;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.login-btn:hover {
+  background-color: #c5dec5 !important ;
+  /* color: #e5dfe3 !important; */
+}

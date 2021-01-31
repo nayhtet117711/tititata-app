@@ -36,12 +36,19 @@ class Layout extends Component {
 				// audio.volume = 0.1;
 				// audio.play();
 			} else if(data.to===this.props.myInfo.socketId) {
-				console.log("message: ", [...this.props.messages, {...data, type: "received"}])
+				//console.log("message: ", [...this.props.messages, {...data, type: "received"}])
 				this.props.setMessages([...this.props.messages, {...data, type: "received"}])
 				// this.setState(prev=> ({ messages: [...prev.messages, {...data, type: "received"}] }))
 				const audio = new window.Audio("https://proxy.notificationsounds.com/message-tones/pristine-609/download/file-sounds-1150-pristine.mp3");
 				audio.volume = 0.5;
 				audio.play();
+
+				if(data.from !== this.props.selectedUser){
+					const i = this.props.activeUsers.findIndex(v=> v.socketId == data.from)
+					let newArr = [...this.props.activeUsers]
+					newArr[i].isRead = false
+					this.props.setActiveUsers(newArr)
+				}
 			}
 		})
 	}
@@ -55,9 +62,15 @@ class Layout extends Component {
 		// 	console.log(socketId)
 		// })
 		socket.on("user-list-updated", d => {
-			// console.log("user-list-updated ", d)
+			// console.log("user-list-updated ", d.userList)
 			const userList = this.props.myInfo ? d.userList.filter(v => v.socketId!==this.props.myInfo.socketId) : d.userList
-			this.props.setActiveUsers(userList)
+			
+			const newUserList = userList.map(v=>(
+				{...v,
+				isRead: true}
+			))
+			this.props.setActiveUsers(newUserList)
+			
 		})
 		socket.on("welcome-my-info", d => {
 			this.props.setMyInfo(d.myInfo)
@@ -69,6 +82,7 @@ class Layout extends Component {
 	}
 
 	render() {
+		
 		const widthPercent = this.state.page.width>=3840 ? "40%" 
 			: this.state.page.width>= 2160 ? "60%" 
 			: this.state.page.width>= 1920 ? "75%" 
